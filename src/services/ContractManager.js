@@ -52,14 +52,15 @@ class ContractManager {
         return [asa_id, asa_amount, max_entries];
       },
       contractDeployed: async (contractId) => {
-        console.log(contractId);
-        this.contractId = contractId;
+        const contract_id = stdlib.bigNumberToNumber(contractId);
+        console.log(contractId, contractId);
+        this.contractId = contract_id;
 
         try {
           const id = await db.contracts.add({
-            contract_id: contractId,
+            contract_id: contract_id,
             asa_id: asa_id,
-            deployer_address: this.account.getAddress(),
+            deployer_address: stdlib.formatAddress(this.account.getAddress()),
             asa_amount: asa_amount,
             max_entries: max_entries,
             status: 'active',
@@ -75,6 +76,19 @@ class ContractManager {
         return;
       },
     });
+  }
+
+  async subscribeToWhitelist(contractId) {
+    if (!this.account) {
+      alert('Please authenticate first.');
+      return false;
+    }
+
+    const account = stdlib.getDefaultAccount();
+    const ctcMember = account.contract(backend, contractId);
+    const memberApi = ctcMember.a.MemberAPI;
+
+    const isSubscribed = await memberApi.joinWhitelist();
   }
 }
 

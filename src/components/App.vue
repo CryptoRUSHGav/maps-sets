@@ -4,16 +4,19 @@
     <div>Welcome to our Whitelist. Join while you still can to receive an airdrop!</div>
 
     <WhitelistDeployment v-if="!contractId" @contractId="getContractId" />
+    <ContractsTable />
   </div>
 </template>
 
 <script>
+  import ContractsTable from './ContractsTable.vue';
   import WhitelistDeployment from './WhitelistDeployment.vue';
 
   export default {
     name: 'App',
     components: {
       WhitelistDeployment,
+      ContractsTable,
     },
     data() {
       return {
