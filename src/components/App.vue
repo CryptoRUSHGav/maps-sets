@@ -1,23 +1,29 @@
 <template>
   <div>
     <h1>The Coolest Airdrops</h1>
-    <div>
-      Welcome to our Whitelist. Join while you still can to receive an airdrop!
-    </div>
+    <div>Welcome to our Whitelist. Join while you still can to receive an airdrop!</div>
 
-    <WhitelistDeployment msg="Welcome Deployer" />
-
-    <footer>Powered by Reach</footer>
+    <WhitelistDeployment v-if="!contractId" @contractId="getContractId" />
   </div>
 </template>
 
 <script>
-import WhitelistDeployment from "./WhitelistDeployment.vue";
+  import WhitelistDeployment from './WhitelistDeployment.vue';
 
-export default {
-  name: "App",
-  components: {
-    WhitelistDeployment,
-  },
-};
+  export default {
+    name: 'App',
+    components: {
+      WhitelistDeployment,
+    },
+    data() {
+      return {
+        contractId: null,
+      };
+    },
+    methods: {
+      getContractId(value) {
+        this.contractId = value;
+      },
+    },
+  };
 </script>

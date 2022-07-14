@@ -27,6 +27,8 @@ class ContractManager {
   async authenticate() {
     try {
       this.account = await stdlib.getDefaultAccount();
+
+      return this.account;
     } catch (e) {
       console.log("Error authenticating. ", e);
     }
