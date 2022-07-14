@@ -1,18 +1,19 @@
-"reach 0.1";
+'reach 0.1';
 
 export const main = Reach.App(() => {
   setOptions({ untrustworthyMaps: true });
 
-  const Deployer = Participant("Deployer", {
+  const Deployer = Participant('Deployer', {
     getInfo: Fun([], Tuple(Token, UInt, UInt)),
+    contractDeployed: Fun([Contract], Null),
     log: Fun(true, Null),
   });
 
-  const MemberApi = API("MemberAPI", {
+  const MemberApi = API('MemberAPI', {
     joinWhitelist: Fun([], Bool),
   });
 
-  const vWL = View("Whitelist", {
+  const vWL = View('Whitelist', {
     ASA: Token,
     ASAAmount: UInt,
     airdropAmount: UInt,
@@ -28,17 +29,20 @@ export const main = Reach.App(() => {
   Deployer.only(() => {
     const [ASA, ASAAmount, maxMembers] = declassify(interact.getInfo());
 
-    check(ASAAmount > 0, "No negative amounts allowed.");
-    check(
-      maxMembers > 0 && maxMembers <= ASAAmount,
-      "We can't have more members than tokens to distribute!"
-    );
+    check(ASAAmount > 0, 'No negative amounts allowed.');
+    check(maxMembers > 0 && maxMembers <= ASAAmount, "We can't have more members than tokens to distribute!");
 
     const airdropAmount = ASAAmount / maxMembers;
-    check(airdropAmount > 0, "We do not want to be airdropping some debt!");
+    check(airdropAmount > 0, 'We do not want to be airdropping some debt!');
   });
 
   commit();
+
+  const info = getContract();
+
+  Deployer.only(() => {
+    interact.contractDeployed(info);
+  });
 
   // Deployoer should transfer the ASA amount to the contract
   Deployer.publish(ASA, ASAAmount, airdropAmount, maxMembers);
@@ -70,12 +74,9 @@ export const main = Reach.App(() => {
       MemberApi.joinWhitelist,
       // API ASSUME EXPR
       () => {
-        check(balance(ASA) >= airdropAmount, "NFT needs to move into escrow.");
-        check(!Members.member(this), "You already are a member of our WL.");
-        check(
-          membersCnt < maxMembers,
-          "The whitelist does not accept any more members."
-        );
+        check(balance(ASA) >= airdropAmount, 'NFT needs to move into escrow.');
+        check(!Members.member(this), 'You already are a member of our WL.');
+        check(membersCnt < maxMembers, 'The whitelist does not accept any more members.');
       },
       // PAY EXPR
       () => {
@@ -83,13 +84,10 @@ export const main = Reach.App(() => {
       },
       // API CONSENSUS EXPR
       (returnFunc) => {
-        check(balance(ASA) >= airdropAmount, "NFT needs to move into escrow.");
-        check(!Members.member(this), "You already are a member of our WL.");
-        check(
-          membersCnt < maxMembers,
-          "The whitelist does not accept any more members."
-        );
-        check(balance() == 0, "There should be no balance");
+        check(balance(ASA) >= airdropAmount, 'NFT needs to move into escrow.');
+        check(!Members.member(this), 'You already are a member of our WL.');
+        check(membersCnt < maxMembers, 'The whitelist does not accept any more members.');
+        check(balance() == 0, 'There should be no balance');
 
         Members.insert(this);
 
@@ -104,7 +102,7 @@ export const main = Reach.App(() => {
         } else {
           transfer([0, [airdropAmount, ASA]]).to(this);
 
-          Deployer.interact.log("We have a new member!");
+          Deployer.interact.log('We have a new member!');
 
           returnFunc(true);
 
@@ -115,7 +113,7 @@ export const main = Reach.App(() => {
 
   transfer([balance(), [balance(ASA), ASA]]).to(Deployer);
 
-  check(balance(ASA) == 0, "We should not have any remaining ASA balance");
+  check(balance(ASA) == 0, 'We should not have any remaining ASA balance');
 
   commit();
   exit();
