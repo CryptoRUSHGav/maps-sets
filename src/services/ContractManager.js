@@ -42,6 +42,22 @@ class ContractManager {
 
     const ctcDeployer = this.account.contract(backend);
 
+    try {
+      console.log('Accepting ASA', asa_id, asa_amount);
+      await this.account.tokenAccept(asa_id);
+
+      const asa_balance = stdlib.bigNumberToNumber(await this.account.balanceOf(asa_id));
+      console.log(asa_balance);
+
+      if (asa_balance < asa_amount) {
+        alert(`Your balance of ${asa_balance} for ASA #${asa_id} is insufficient to proceed.`);
+        return false;
+      }
+    } catch (e) {
+      alert(e);
+      return false;
+    }
+
     console.log('Starting Deployment');
 
     await backend.Deployer(ctcDeployer, {
@@ -58,11 +74,11 @@ class ContractManager {
 
         try {
           const id = await db.contracts.add({
-            contract_id: contract_id,
-            asa_id: asa_id,
+            contract_id: Number(contract_id),
+            asa_id: Number(asa_id),
             deployer_address: stdlib.formatAddress(this.account.getAddress()),
-            asa_amount: asa_amount,
-            max_entries: max_entries,
+            asa_amount: Number(asa_amount),
+            max_entries: Number(max_entries),
             status: 'active',
           });
 
@@ -94,7 +110,19 @@ class ContractManager {
 
     let isSubscribed = false;
     try {
+      console.log('Accepting ASA');
+      const contract = await this.loadContract(contractId);
+      console.log(contract);
+      await this.account.tokenAccept(contract.asa_id);
+
+      let [membersCnt, lastMember, airdropAmount] = await this.getViewInfo(contractId);
+
       isSubscribed = await memberApi.joinWhitelist();
+
+      if (membersCnt + 1 >= contract.max_entries) {
+        const update = await db.contracts.update(contract.id, { status: 'settled' });
+        console.log('Status updated? ', update);
+      }
     } catch (e) {
       alert(e.message);
 
@@ -113,14 +141,17 @@ class ContractManager {
     }
 
     const ctcMember = this.account.contract(backend, contractId);
-    const v = ctcMember.unsafeViews.Whitelist;
+    const v = ctcMember.views.Whitelist;
 
     let membersCnt = await v.membersCnt();
-    membersCnt = stdlib.bigNumberToNumber(membersCnt);
+
+    membersCnt = membersCnt ? stdlib.bigNumberToNumber(membersCnt[1]) : 0;
+
     let lastMember = await v.lastMember();
-    lastMember = stdlib.formatAddress(lastMember);
+    lastMember = lastMember ? stdlib.formatAddress(lastMember[1]) : null;
+
     let airdropAmount = await v.airdropAmount();
-    airdropAmount = stdlib.bigNumberToNumber(airdropAmount);
+    airdropAmount = airdropAmount ? stdlib.bigNumberToNumber(airdropAmount[1]) : 0;
 
     console.log([membersCnt, lastMember, airdropAmount]);
     return [membersCnt, lastMember, airdropAmount];
@@ -132,7 +163,7 @@ class ContractManager {
       return false;
     }
 
-    const contract = await db.contracts.get({ contract_id: contractId.toString() });
+    const contract = await db.contracts.get({ contract_id: contractId });
 
     console.log('contract', contract);
     return contract;

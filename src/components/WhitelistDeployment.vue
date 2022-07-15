@@ -23,8 +23,17 @@
             <label for="asa_amount">Token Amount</label>
             <input v-model="asa_amount" type="number" class="form-control" id="asa_amount" placeholder="Total number of tokens you are distributing." />
           </div>
-          <button type="button" @click="deployContract" class="btn btn-primary">Deploy Contract</button>
+          <button type="button" @click="deployContract" class="btn btn-primary" :disabled="isDeploying">Deploy Contract</button>
         </form>
+        <div v-if="deploying" class="progress mt-2">
+          <div
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            :style="progressWidth"
+            :aria-valuenow="currentProgress"
+            aria-valuemin="0"
+            aria-valuemax="100"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -49,7 +58,22 @@
         asa_id: null,
         asa_amount: null,
         max_entries: null,
+        progress: 50,
+        isDeploying: false,
       };
+    },
+    computed: {
+      currentProgress() {
+        console.log(this.progress);
+        return this.progress;
+      },
+      progressWidth() {
+        return `width: ${this.currentProgress}%`;
+      },
+      deploying() {
+        console.log(this.isDeploying);
+        return this.isDeploying;
+      },
     },
     methods: {
       async authenticate() {
@@ -65,8 +89,20 @@
           return false;
         }
 
-        const isDeployed = await contractManager.deployContract(this.asa_id, this.asa_amount, this.max_entries);
-        console.log('Is Deployed? ', isDeployed);
+        this.isDeploying = true;
+        this.progress = 50;
+        try {
+          const isDeployed = await contractManager.deployContract(this.asa_id, this.asa_amount, this.max_entries);
+          this.progress = 100;
+
+          console.log('Is Deployed? ', isDeployed === null);
+        } catch (e) {
+          alert(e);
+        } finally {
+          setTimeout(() => {
+            this.isDeploying = false;
+          }, 1000);
+        }
       },
     },
     mounted() {

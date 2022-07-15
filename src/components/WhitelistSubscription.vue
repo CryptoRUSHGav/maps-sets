@@ -12,9 +12,10 @@
               class="form-control"
               id="wallet_address"
               aria-describedby="wallet_address_help"
-              placeholder="Enter wallet address" />
+              placeholder="Enter wallet address"
+              disabled />
             <small id="wallet_address_help" class="form-text text-muted">
-              Please enter your Algorand Wallet Address. If space is available in the whitelist you will be guarranteed an AIRDROP!
+              This is your Algorand Wallet Address. If space is available in the whitelist you will be guaranteed an AIRDROP!
             </small>
           </div>
           <button type="button" @click="subscribeToWhitelist" class="btn btn-primary">Subscribe</button>
@@ -60,6 +61,7 @@
         lastMember: null,
         airdropAmount: null,
         maxMembers: null,
+        walletAddress: null,
       };
     },
     methods: {
@@ -68,6 +70,7 @@
 
         if (this.memberAccount) {
           this.$emit('memberAccount', this.memberAccount);
+          this.walletAddress = this.memberAccount.networkAccount.addr;
 
           [this.membersCnt, this.lastMember, this.airdropAmount] = await contractManager.getViewInfo(this.contractId);
         }
@@ -87,7 +90,7 @@
         console.log('Is Deployed? ', isDeployed);
         if (isDeployed) {
           alert('Address was entered successfully');
-          this.walletAddress = null;
+          window.location.reload();
         }
       },
     },

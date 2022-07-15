@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
-    "@reach-sh/stdlib": "^0.1.11-rc.2",
+    "@reach-sh/stdlib": "^0.1.11-rc.3",
     "@vueuse/rxjs": "^8.9.3",
     "core-js": "^3.10.0",
     "dexie": "^3.2.2",
