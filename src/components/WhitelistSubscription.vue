@@ -6,7 +6,13 @@
         <form>
           <div class="form-group">
             <label for="wallet_address">Wallet Address</label>
-            <input type="number" class="form-control" id="wallet_address" aria-describedby="wallet_address_help" placeholder="Enter wallet address" />
+            <input
+              v-model="walletAddress"
+              type="text"
+              class="form-control"
+              id="wallet_address"
+              aria-describedby="wallet_address_help"
+              placeholder="Enter wallet address" />
             <small id="wallet_address_help" class="form-text text-muted">
               Please enter your Algorand Wallet Address. If space is available in the whitelist you will be guarranteed an AIRDROP!
             </small>
@@ -23,16 +29,15 @@
   export default {
     name: 'WhitelistSubscription',
     props: {
-      lastContractId: {
+      contractId: {
         type: Number,
-        required: false,
-        default: null,
+        required: true,
       },
     },
     data() {
       return {
-        contractId: null,
         memberAccount: null,
+        walletAddress: null,
       };
     },
     methods: {
@@ -43,15 +48,24 @@
           this.$emit('memberAccount', this.memberAccount);
         }
       },
-      // async deployContract() {
-      //   if (!this.deployerAccount) {
-      //     alert('You cannot deploy, please authenticate first');
-      //     return false;
-      //   }
+      async subscribeToWhitelist() {
+        if (!this.memberAccount) {
+          alert('You cannot subscribe, please authenticate first');
+          return false;
+        }
 
-      //   const isDeployed = await contractManager.deployContract(this.asa_id, this.asa_amount, this.max_entries);
-      //   console.log('Is Deployed? ', isDeployed);
-      // },
+        if (!this.walletAddress || this.walletAddress.length < 58) {
+          alert('Please enter a valid wallet address');
+          return false;
+        }
+
+        const isDeployed = await contractManager.subscribeToWhitelist(this.contractId, this.wallet_address);
+        console.log('Is Deployed? ', isDeployed);
+        if (isDeployed) {
+          alert('Address was entered successfully');
+          this.walletAddress = null;
+        }
+      },
     },
     mounted() {},
   };

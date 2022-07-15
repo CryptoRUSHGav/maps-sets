@@ -78,17 +78,28 @@ class ContractManager {
     });
   }
 
-  async subscribeToWhitelist(contractId) {
+  async subscribeToWhitelist(contractId, walletAddress) {
     if (!this.account) {
       alert('Please authenticate first.');
       return false;
     }
 
-    const account = stdlib.getDefaultAccount();
-    const ctcMember = account.contract(backend, contractId);
+    if (!contractId) {
+      alert('Please provide a contract.');
+      return false;
+    }
+
+    const ctcMember = this.account.contract(backend, contractId);
     const memberApi = ctcMember.a.MemberAPI;
 
-    const isSubscribed = await memberApi.joinWhitelist();
+    let isSubscribed = false;
+    try {
+      isSubscribed = await memberApi.joinWhitelist();
+    } catch (e) {
+      alert(e.message);
+    }
+
+    return isSubscribed;
   }
 }
 
