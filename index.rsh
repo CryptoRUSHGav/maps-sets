@@ -68,7 +68,7 @@ export const main = Reach.App(() => {
     .invariant(balance() == 0)
     .invariant(balance(ASA) >= 0)
     .invariant(membersCnt <= maxMembers)
-    .while(membersCnt < 5)
+    .while(membersCnt < maxMembers)
     .api(
       // API EXPR
       MemberApi.joinWhitelist,
