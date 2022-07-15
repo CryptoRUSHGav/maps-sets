@@ -95,12 +95,13 @@
           const isDeployed = await contractManager.deployContract(this.asa_id, this.asa_amount, this.max_entries);
           this.progress = 100;
 
-          console.log('Is Deployed? ', isDeployed === null);
+          console.log('Is Deployed? ', isDeployed);
         } catch (e) {
           alert(e);
         } finally {
           setTimeout(() => {
             this.isDeploying = false;
+            window.location.reload();
           }, 1000);
         }
       },

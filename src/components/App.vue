@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h1>The Coolest Airdrops</h1>
-    <div>Welcome to our Whitelist. Join while you still can to receive an airdrop!</div>
+    <h1>The Coolest Airdrop</h1>
+    <div class="mb-5">Welcome to our Whitelist. Join while you still can to receive an airdrop!</div>
 
     <WhitelistDeployment v-if="!contractId" @contractId="getContractId" />
     <WhitelistSubscription v-else :contractId="contractId" />

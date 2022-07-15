@@ -91,7 +91,13 @@ class ContractManager {
 
         return;
       },
+      ready: () => {
+        window.location.reload();
+        return;
+      },
     });
+
+    return true;
   }
 
   async subscribeToWhitelist(contractId, walletAddress) {

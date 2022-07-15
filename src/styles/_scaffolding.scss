@@ -3,7 +3,6 @@ html {
   font-family: $font-family;
   background: $background-color;
   color: $font-color;
-  max-width: $page-width;
   line-height: 1.4;
 }
 
@@ -18,15 +17,15 @@ body {
   justify-content: center;
   flex-direction: column;
   align-self: center;
- // height: 100vh;
+  // height: 100vh;
 }
 
 h1 {
-   color: green;
-   text-align: left;
-   max-width: 90vw;
+  color: green;
+  text-align: left;
+  max-width: 90vw;
 }
 
 .test {
-    color: red;
+  color: red;
 }
