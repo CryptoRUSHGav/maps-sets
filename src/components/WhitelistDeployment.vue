@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mt-5">
     <div>
       <button v-if="!deployerAccount" type="button" @click="authenticate" class="btn btn-primary">Authenticate to Deploy</button>
       <div v-else>

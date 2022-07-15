@@ -1,5 +1,5 @@
 <template>
-  <div class="table-responsive">
+  <div class="table-responsive mt-5">
     <h3>Contracts</h3>
     <table class="table">
       <thead>

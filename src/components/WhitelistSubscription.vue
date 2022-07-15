@@ -19,6 +19,24 @@
           </div>
           <button type="button" @click="subscribeToWhitelist" class="btn btn-primary">Subscribe</button>
         </form>
+
+        <div v-if="memberAccount" class="mt-5">
+          <h4>Contract View Information:</h4>
+          <ul class="list-group">
+            <li class="list-group-item">
+              <strong>Members in list:</strong>
+              {{ membersCnt }} ({{ maxMembers - membersCnt }} remaining)
+            </li>
+            <li class="list-group-item">
+              <strong>Last Added Member:</strong>
+              {{ lastMember }}
+            </li>
+            <li class="list-group-item">
+              <strong>Airdrop Amount:</strong>
+              {{ airdropAmount }}
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -38,6 +56,10 @@
       return {
         memberAccount: null,
         walletAddress: null,
+        membersCnt: null,
+        lastMember: null,
+        airdropAmount: null,
+        maxMembers: null,
       };
     },
     methods: {
@@ -46,6 +68,8 @@
 
         if (this.memberAccount) {
           this.$emit('memberAccount', this.memberAccount);
+
+          [this.membersCnt, this.lastMember, this.airdropAmount] = await contractManager.getViewInfo(this.contractId);
         }
       },
       async subscribeToWhitelist() {
@@ -67,6 +91,13 @@
         }
       },
     },
-    mounted() {},
+    async mounted() {
+      this.contract = await contractManager.loadContract(this.contractId);
+
+      if (this.contract) {
+        console.log(this.contract);
+        this.maxMembers = parseInt(this.contract.max_entries);
+      }
+    },
   };
 </script>

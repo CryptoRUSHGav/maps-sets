@@ -97,9 +97,45 @@ class ContractManager {
       isSubscribed = await memberApi.joinWhitelist();
     } catch (e) {
       alert(e.message);
+
+      if (e.message.match(/The whitelist does not accept any more members/)) {
+        alert("We're full");
+      }
     }
 
     return isSubscribed;
+  }
+
+  async getViewInfo(contractId) {
+    if (!this.account) {
+      alert('Please authenticate first.');
+      return false;
+    }
+
+    const ctcMember = this.account.contract(backend, contractId);
+    const v = ctcMember.unsafeViews.Whitelist;
+
+    let membersCnt = await v.membersCnt();
+    membersCnt = stdlib.bigNumberToNumber(membersCnt);
+    let lastMember = await v.lastMember();
+    lastMember = stdlib.formatAddress(lastMember);
+    let airdropAmount = await v.airdropAmount();
+    airdropAmount = stdlib.bigNumberToNumber(airdropAmount);
+
+    console.log([membersCnt, lastMember, airdropAmount]);
+    return [membersCnt, lastMember, airdropAmount];
+  }
+
+  async loadContract(contractId) {
+    if (!contractId) {
+      alert('Please provide a contract to load');
+      return false;
+    }
+
+    const contract = await db.contracts.get({ contract_id: contractId.toString() });
+
+    console.log('contract', contract);
+    return contract;
   }
 }
 
