@@ -11,7 +11,6 @@
           <th scope="col">Deployer Address</th>
           <th scope="col">Max Entries</th>
           <th scope="col">Status</th>
-          <th scope="col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -20,7 +19,11 @@
           <td>{{ contract.contract_id }}</td>
           <td>{{ contract.asa_id }}</td>
           <td>{{ contract.asa_amount }}</td>
-          <td>{{ contract.deployer_address }}</td>
+          <td>
+            <a :href="'https://testnet.algoexplorer.io/address/' + contract.deployer_address" target="_blank">
+              {{ truncateAddress(contract.deployer_address) }}
+            </a>
+          </td>
           <td>{{ contract.max_entries }}</td>
           <td>{{ contract.status }}</td>
         </tr>
@@ -36,6 +39,13 @@
   export default {
     name: 'ContractsTable.vue',
     components: {},
+    methods: {
+      truncateAddress(address) {
+        const truncated_addr = address.substring(0, 4) + '...' + address.substring(address.length - 4, address.length);
+
+        return truncated_addr;
+      },
+    },
     setup() {
       return {
         db,
