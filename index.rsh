@@ -6,6 +6,7 @@ export const main = Reach.App(() => {
   const Deployer = Participant('Deployer', {
     getInfo: Fun([], Tuple(Token, UInt, UInt)),
     contractDeployed: Fun([Contract], Null),
+    ready: Fun([], Null),
     log: Fun(true, Null),
   });
 
@@ -49,6 +50,8 @@ export const main = Reach.App(() => {
   commit();
 
   Deployer.pay([0, [ASAAmount, ASA]]);
+
+  Deployer.interact.ready();
 
   {
     vWL.ASA.set(ASA);
