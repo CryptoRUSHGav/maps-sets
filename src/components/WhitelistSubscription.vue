@@ -18,8 +18,18 @@
               This is your Algorand Wallet Address. If space is available in the whitelist you will be guaranteed an AIRDROP!
             </small>
           </div>
-          <button type="button" @click="subscribeToWhitelist" class="btn btn-primary">Subscribe</button>
+          <button type="button" @click="subscribeToWhitelist" class="btn btn-primary" :disabled="isSubscribing">Subscribe</button>
         </form>
+
+        <div v-if="subscribing" class="progress mt-2">
+          <div
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            :style="progressWidth"
+            :aria-valuenow="currentProgress"
+            aria-valuemin="0"
+            aria-valuemax="100"></div>
+        </div>
 
         <div v-if="memberAccount" class="mt-5">
           <h4>Contract View Information:</h4>
@@ -62,7 +72,22 @@
         airdropAmount: null,
         maxMembers: null,
         walletAddress: null,
+        progress: 50,
+        isSubscribing: false,
       };
+    },
+    computed: {
+      currentProgress() {
+        console.log(this.progress);
+        return this.progress;
+      },
+      progressWidth() {
+        return `width: ${this.currentProgress}%`;
+      },
+      subscribing() {
+        console.log(this.isSubscribing);
+        return this.isSubscribing;
+      },
     },
     methods: {
       async authenticate() {
@@ -86,10 +111,15 @@
           return false;
         }
 
-        const isDeployed = await contractManager.subscribeToWhitelist(this.contractId, this.wallet_address);
-        console.log('Is Deployed? ', isDeployed);
-        if (isDeployed) {
+        this.isSubscribing = true;
+        this.progress = 50;
+
+        const isSubscribed = await contractManager.subscribeToWhitelist(this.contractId, this.wallet_address);
+        this.progress = 100;
+        console.log('Is Subscribed? ', isSubscribed);
+        if (isSubscribed) {
           alert('Address was entered successfully');
+          this.isSubscribing = false;
           window.location.reload();
         }
       },
